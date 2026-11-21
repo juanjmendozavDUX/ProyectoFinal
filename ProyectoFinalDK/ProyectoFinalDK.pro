@@ -1,25 +1,29 @@
-QT += widgets multimedia
-
+QT += widgets multimedia multimediawidgets
 CONFIG += c++17
-
-# You can make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+TEMPLATE = app
+TARGET = ProyectoFinalDK
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    gamewidget.cpp \
+    entidades.cpp \
+    personaje.cpp \
+    donky.cpp \
+    nivel.cpp \
+    donygrafico.cpp \
+    barco.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    gamewidget.h \
+    entidades.h \
+    personaje.h \
+    donky.h \
+    nivel.h \
+    donygrafico.h \
+    barco.h
 
-FORMS += \
-    mainwindow.ui
+RESOURCES += recursos.qrc
 
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
-
-RESOURCES += \
-    recursos.qrc
+win32:CONFIG += windows

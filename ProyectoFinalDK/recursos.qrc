@@ -1,45 +1,45 @@
 <RCC>
-    <qresource prefix="/audio">
-        <file>recursos/audio/Batalla del Río.mp3</file>
-        <file>recursos/audio/click.wav</file>
-        <file>recursos/audio/Derroada Retro.mp3</file>
-        <file>recursos/audio/disparo.wav</file>
-        <file>recursos/audio/Exploración de la Selva.mp3</file>
-        <file>recursos/audio/explosion.wav</file>
-        <file>recursos/audio/golpe.wav</file>
-        <file>recursos/audio/item.wav</file>
-        <file>recursos/audio/lanzar.wav</file>
-        <file>recursos/audio/resbalon.wav</file>
-        <file>recursos/audio/rescate.wav</file>
-        <file>recursos/audio/Rescue Salsa.mp3</file>
-        <file>recursos/audio/salto.wav</file>
-        <file>recursos/audio/Victoria Retro.mp3</file>
-    </qresource>
-    <qresource prefix="/fondos">
-        <file>recursos/fondos/Gemini_Generated_Gif_w02l48w02l48w02l.gif</file>
-        <file>recursos/fondos/Gemini_Generated_Image_noy3lenoy3lenoy3 (1).jpg</file>
-        <file>recursos/fondos/Gemini_Generated_Image_noy3lenoy3lenoy3.jpg</file>
-        <file>recursos/fondos/derrota.jpg</file>
-        <file>recursos/fondos/dificultad_dificil.jpg</file>
-        <file>recursos/fondos/dificultad_facil.jpg</file>
-        <file>recursos/fondos/victoria.jpg</file>
-    </qresource>
-    <qresource prefix="/sprites">
-        <file>recursos/sprites/avion1.png</file>
-        <file>recursos/sprites/avion2.png</file>
-        <file>recursos/sprites/azucar.png</file>
-        <file>recursos/sprites/bananas.png</file>
-        <file>recursos/sprites/barcos1.png</file>
-        <file>recursos/sprites/barcos2.png</file>
-        <file>recursos/sprites/barcos3.png</file>
-        <file>recursos/sprites/barril.png</file>
-        <file>recursos/sprites/bomba.png</file>
-        <file>recursos/sprites/cascaras.png</file>
-        <file>recursos/sprites/chile.png</file>
-        <file>recursos/sprites/civiles.png</file>
-        <file>recursos/sprites/DKsprites.png</file>
-        <file>recursos/sprites/jaguar.png</file>
-        <file>recursos/sprites/piraña.png</file>
-        <file>recursos/sprites/soldados.png</file>
-    </qresource>
+ <qresource prefix="/audio">
+  <file alias="selva.mp3">recursos/audio/exploracion_selva.mp3</file>
+  <file alias="rio.mp3">recursos/audio/batalla_rio.mp3</file>
+  <file alias="rescate.mp3">recursos/audio/Rescue Salsa.mp3</file>
+  <file alias="victoria.mp3">recursos/audio/Victoria Retro.mp3</file>
+  <file alias="derrota.mp3">recursos/audio/Derroada Retro.mp3</file>
+  <file alias="click.wav">recursos/audio/click.wav</file>
+  <file alias="salto.wav">recursos/audio/salto.wav</file>
+  <file alias="golpe.wav">recursos/audio/golpe.wav</file>
+  <file alias="disparo.wav">recursos/audio/disparo.wav</file>
+  <file alias="explosion.wav">recursos/audio/explosion.wav</file>
+  <file alias="item.wav">recursos/audio/item.wav</file>
+  <file alias="lanzar.wav">recursos/audio/lanzar.wav</file>
+  <file alias="resbalon.wav">recursos/audio/resbalon.wav</file>
+  <file alias="rescate.wav">recursos/audio/rescate.wav</file>
+ </qresource>
+ <qresource prefix="/fondos">
+  <file alias="menu.gif">recursos/fondos/menu.gif</file>
+  <file alias="nivel1.jpg">recursos/fondos/nivel1.jpg</file>
+  <file alias="nivel2.jpg">recursos/fondos/nivel2.jpg</file>
+  <file alias="dificultad_facil.jpg">recursos/fondos/dificultad_facil.jpg</file>
+  <file alias="dificultad_dificil.jpg">recursos/fondos/dificultad_dificil.jpg</file>
+  <file alias="victoria.jpg">recursos/fondos/victoria.jpg</file>
+  <file alias="derrota.jpg">recursos/fondos/derrota.jpg</file>
+ </qresource>
+ <qresource prefix="/sprites">
+  <file alias="DKsprites.png">recursos/sprites/DKsprites.png</file>
+  <file alias="barcos1.png">recursos/sprites/barcos1.png</file>
+  <file alias="barcos2.png">recursos/sprites/barcos2.png</file>
+  <file alias="barcos3.png">recursos/sprites/barcos3.png</file>
+  <file alias="avion1.png">recursos/sprites/avion1.png</file>
+  <file alias="avion2.png">recursos/sprites/avion2.png</file>
+  <file alias="soldados.png">recursos/sprites/soldados.png</file>
+  <file alias="jaguar.png">recursos/sprites/jaguar.png</file>
+  <file alias="pirana.png">recursos/sprites/pirana.png</file>
+  <file alias="civiles.png">recursos/sprites/civiles.png</file>
+  <file alias="barril.png">recursos/sprites/barril.png</file>
+  <file alias="bomba.png">recursos/sprites/bomba.png</file>
+  <file alias="bananas.png">recursos/sprites/bananas.png</file>
+  <file alias="azucar.png">recursos/sprites/azucar.png</file>
+  <file alias="cascaras.png">recursos/sprites/cascaras.png</file>
+  <file alias="chile.png">recursos/sprites/chile.png</file>
+ </qresource>
 </RCC>
