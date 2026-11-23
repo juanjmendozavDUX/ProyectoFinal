@@ -8,6 +8,8 @@ SOURCES += \
     mainwindow.cpp \
     gamewidget.cpp \
     entidades.cpp \
+    nivel2widget.cpp \
+    objetos.cpp \
     personaje.cpp \
     donky.cpp \
     nivel.cpp \
@@ -18,6 +20,8 @@ HEADERS += \
     mainwindow.h \
     gamewidget.h \
     entidades.h \
+    nivel2widget.h \
+    objetos.h \
     personaje.h \
     donky.h \
     nivel.h \

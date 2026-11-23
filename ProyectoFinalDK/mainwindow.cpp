@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "gamewidget.h"
+#include "nivel2widget.h"
 
 #include <QAudioOutput>
 #include <QApplication>
@@ -17,6 +18,7 @@
 #include <QStandardPaths>
 #include <QUrl>
 #include <QVBoxLayout>
+#include <QVideoWidget>
 
 namespace {
 QPushButton* crearBoton(const QString& texto, QWidget* parent)
@@ -37,8 +39,12 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
     m_paginas(new QStackedWidget(this)),
     m_prueba(new GameWidget(this)),
+    m_nivel2(new Nivel2Widget(this)),
     m_musica(new QMediaPlayer(this)),
-    m_audio(new QAudioOutput(this))
+    m_audio(new QAudioOutput(this)),
+    m_reproductorVideo(new QMediaPlayer(this)),
+    m_audioVideo(new QAudioOutput(this)),
+    m_videoWidget(new QVideoWidget(this))
 {
     setWindowTitle("Donkey Kong: Defensa del Amazonas");
     setFixedSize(960, 600);
@@ -51,26 +57,61 @@ MainWindow::MainWindow(QWidget* parent)
                 qWarning() << "Error de musica:" << error << mensaje;
             });
 
+    m_audioVideo->setVolume(0.85);
+    m_reproductorVideo->setAudioOutput(m_audioVideo);
+    m_reproductorVideo->setVideoOutput(m_videoWidget);
+    connect(m_reproductorVideo, &QMediaPlayer::mediaStatusChanged, this,
+            [this](QMediaPlayer::MediaStatus estado) {
+                if (estado == QMediaPlayer::EndOfMedia)
+                    finalizarVideoActual();
+            });
+    connect(m_reproductorVideo, &QMediaPlayer::errorOccurred, this,
+            [this](QMediaPlayer::Error error, const QString& mensaje) {
+                qWarning() << "Error de video:" << error << mensaje;
+                finalizarVideoActual();
+            });
+
     m_menu = crearMenu();
     m_dificultad = crearDificultad();
     m_comoJugar = crearComoJugar();
+    m_paginaVideo = crearPaginaVideo();
     m_victoria = crearResultado(true);
     m_derrota = crearResultado(false);
 
     m_paginas->addWidget(m_menu);
     m_paginas->addWidget(m_dificultad);
     m_paginas->addWidget(m_comoJugar);
+    m_paginas->addWidget(m_paginaVideo);
     m_paginas->addWidget(m_prueba);
+    m_paginas->addWidget(m_nivel2);
     m_paginas->addWidget(m_victoria);
     m_paginas->addWidget(m_derrota);
 
+    // Conexiones Nivel 1 -> Video Intro Nivel 2 -> Nivel 2
     connect(m_prueba, &GameWidget::regresarAlMenu, this, [this] {
         m_paginas->setCurrentWidget(m_menu);
         enfocarMenu(0);
         reproducirMusica(":/audio/selva.mp3");
     });
-    connect(m_prueba, &GameWidget::nivelCompletado, this, &MainWindow::mostrarVictoria);
+    connect(m_prueba, &GameWidget::nivelCompletado, this, [this] {
+        reproducirVideoTransicion(":/videos/intro_nivel2.mp4", [this] {
+            iniciarNivel2();
+        });
+    });
     connect(m_prueba, &GameWidget::jugadorDerrotado, this, &MainWindow::mostrarDerrota);
+
+    // Conexiones Nivel 2 -> Video Final -> Victoria
+    connect(m_nivel2, &Nivel2Widget::regresarAlMenu, this, [this] {
+        m_paginas->setCurrentWidget(m_menu);
+        enfocarMenu(0);
+        reproducirMusica(":/audio/selva.mp3");
+    });
+    connect(m_nivel2, &Nivel2Widget::nivel2Completado, this, [this] {
+        reproducirVideoTransicion(":/videos/final_juego.mp4", [this] {
+            mostrarVictoria();
+        });
+    });
+    connect(m_nivel2, &Nivel2Widget::jugadorDerrotado, this, &MainWindow::mostrarDerrota);
 
     m_paginas->setCurrentWidget(m_menu);
     enfocarMenu(0);
@@ -166,7 +207,7 @@ QWidget* MainWindow::crearComoJugar()
     capaOscura->setStyleSheet("border-image:none;background:rgba(10, 24, 18, 210);");
 
     auto* panel = new QWidget(capaOscura);
-    panel->setGeometry(170, 55, 620, 490);
+    panel->setGeometry(150, 55, 660, 490);
     panel->setStyleSheet("background:rgba(18, 42, 32, 235);border:3px solid #e4af55;border-radius:14px;");
 
     auto* layout = new QVBoxLayout(panel);
@@ -194,8 +235,8 @@ QWidget* MainWindow::crearComoJugar()
         {"A / Flecha izquierda", "Moverse a la izquierda"},
         {"D / Flecha derecha", "Moverse a la derecha"},
         {"Espacio / Flecha arriba", "Saltar"},
-        {"F o X", "Atacar"},
-        {"Escape", "Regresar"}
+        {"F o X", "Atacar / Lanzar barriles"},
+        {"Escape", "Regresar / Saltar cinemática"}
     };
 
     for (int i = 0; i < controles.size(); ++i) {
@@ -210,19 +251,55 @@ QWidget* MainWindow::crearComoJugar()
     layout->addStretch();
 
     auto* filaBotones = new QHBoxLayout();
-    filaBotones->setSpacing(18);
-    m_continuarJuego = crearBoton("COMENZAR MISIÓN", panel);
+    filaBotones->setSpacing(14);
+    m_continuarJuego = crearBoton("NIVEL 1 (RÍO)", panel);
+    m_probarNivel2 = crearBoton("NIVEL 2 (SELVA)", panel);
     m_volverDificultad = crearBoton("VOLVER", panel);
     filaBotones->addWidget(m_continuarJuego);
+    filaBotones->addWidget(m_probarNivel2);
     filaBotones->addWidget(m_volverDificultad);
     layout->addLayout(filaBotones);
 
-    connect(m_continuarJuego, &QPushButton::clicked, this, &MainWindow::iniciarNivel1);
+    connect(m_continuarJuego, &QPushButton::clicked, this, [this] {
+        reproducirVideoTransicion(":/videos/intro_nivel1.mp4", [this] {
+            iniciarNivel1();
+        });
+    });
+    connect(m_probarNivel2, &QPushButton::clicked, this, [this] {
+        reproducirVideoTransicion(":/videos/intro_nivel2.mp4", [this] {
+            iniciarNivel2();
+        });
+    });
     connect(m_volverDificultad, &QPushButton::clicked, this, [this] {
         m_paginas->setCurrentWidget(m_dificultad);
         enfocarDificultad(m_esDificil ? 1 : 0);
     });
 
+    return pagina;
+}
+
+QWidget* MainWindow::crearPaginaVideo()
+{
+    auto* pagina = new QWidget(this);
+    pagina->setStyleSheet("background:black;");
+
+    auto* layout = new QVBoxLayout(pagina);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    layout->addWidget(m_videoWidget, 1);
+
+    auto* barraInferior = new QWidget(pagina);
+    barraInferior->setFixedHeight(36);
+    barraInferior->setStyleSheet("background:#0d1a14;border-top:1px solid #d79d4c;");
+    auto* layoutBarra = new QHBoxLayout(barraInferior);
+    layoutBarra->setContentsMargins(16, 4, 16, 4);
+
+    auto* aviso = new QLabel("Presiona ENTER, ESPACIO o ESC para saltar cinemática", barraInferior);
+    aviso->setAlignment(Qt::AlignCenter);
+    aviso->setStyleSheet("color:#ffe59a;font-size:13px;font-weight:bold;border:0;background:transparent;");
+    layoutBarra->addWidget(aviso);
+
+    layout->addWidget(barraInferior);
     return pagina;
 }
 
@@ -256,6 +333,41 @@ void MainWindow::iniciarNivel1()
     reproducirMusica(":/audio/rio.mp3");
 }
 
+void MainWindow::iniciarNivel2()
+{
+    m_paginas->setCurrentWidget(m_nivel2);
+    m_nivel2->iniciarNivel2(m_esDificil);
+    m_nivel2->setFocus();
+    reproducirMusica(":/audio/selva.mp3");
+}
+
+void MainWindow::reproducirVideoTransicion(const QString& recursoVideo, std::function<void()> alTerminar)
+{
+    m_musica->stop();
+    m_accionPostVideo = std::move(alTerminar);
+
+    const QString archivoLocal = prepararArchivoLocal(recursoVideo);
+    if (archivoLocal.isEmpty()) {
+        finalizarVideoActual();
+        return;
+    }
+
+    m_paginas->setCurrentWidget(m_paginaVideo);
+    setFocus();
+    m_reproductorVideo->stop();
+    m_reproductorVideo->setSource(QUrl::fromLocalFile(archivoLocal));
+    m_reproductorVideo->play();
+}
+
+void MainWindow::finalizarVideoActual()
+{
+    m_reproductorVideo->stop();
+    auto accion = std::move(m_accionPostVideo);
+    m_accionPostVideo = nullptr;
+    if (accion)
+        accion();
+}
+
 void MainWindow::mostrarVictoria()
 {
     m_paginas->setCurrentWidget(m_victoria);
@@ -268,10 +380,10 @@ void MainWindow::mostrarDerrota()
     reproducirMusica(":/audio/derrota.mp3");
 }
 
-QString MainWindow::prepararAudioLocal(const QString& recurso)
+QString MainWindow::prepararArchivoLocal(const QString& recurso)
 {
-    if (m_audioLocal.contains(recurso))
-        return m_audioLocal.value(recurso);
+    if (m_archivosLocales.contains(recurso))
+        return m_archivosLocales.value(recurso);
 
     const QString nombre = recurso.section('/', -1);
     const QString carpeta = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
@@ -281,19 +393,19 @@ QString MainWindow::prepararAudioLocal(const QString& recurso)
 
     if (!QFile::exists(destino)) {
         if (!QFile::copy(recurso, destino)) {
-            qWarning() << "No se pudo copiar el audio a" << destino
+            qWarning() << "No se pudo copiar el recurso a" << destino
                        << "El recurso existe:" << QFile::exists(recurso);
             return {};
         }
     }
-    m_audioLocal.insert(recurso, destino);
+    m_archivosLocales.insert(recurso, destino);
     return destino;
 }
 
 void MainWindow::reproducirMusica(const QString& recurso)
 {
     m_musica->stop();
-    const QString archivoLocal = prepararAudioLocal(recurso);
+    const QString archivoLocal = prepararArchivoLocal(recurso);
     if (archivoLocal.isEmpty())
         return;
     m_musica->setSource(QUrl::fromLocalFile(archivoLocal));
@@ -329,14 +441,32 @@ void MainWindow::enfocarDificultad(int indice)
 
 void MainWindow::enfocarComoJugar(int indice)
 {
-    const QList<QPushButton*> botones{m_continuarJuego, m_volverDificultad};
+    const QList<QPushButton*> botones{m_continuarJuego, m_probarNivel2, m_volverDificultad};
     m_comoJugarIndice = (indice + botones.size()) % botones.size();
     botones[m_comoJugarIndice]->setFocus();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
-    if (m_paginas->currentWidget() == m_menu) {
+    if (m_paginas->currentWidget() == m_paginaVideo) {
+        if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter ||
+            event->key() == Qt::Key_Space || event->key() == Qt::Key_Escape) {
+            finalizarVideoActual();
+            return;
+        }
+    } else if (m_paginas->currentWidget() == m_menu) {
+        if (event->key() == Qt::Key_0) {
+            reproducirVideoTransicion(":/videos/intro_nivel1.mp4", [this] { iniciarNivel1(); });
+            return;
+        }
+        if (event->key() == Qt::Key_1) {
+            reproducirVideoTransicion(":/videos/intro_nivel2.mp4", [this] { iniciarNivel2(); });
+            return;
+        }
+        if (event->key() == Qt::Key_2) {
+            reproducirVideoTransicion(":/videos/final_juego.mp4", [this] { mostrarVictoria(); });
+            return;
+        }
         if (event->key() == Qt::Key_Up) { enfocarMenu(m_menuIndice - 1); return; }
         if (event->key() == Qt::Key_Down) { enfocarMenu(m_menuIndice + 1); return; }
         if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter || event->key() == Qt::Key_Space) {

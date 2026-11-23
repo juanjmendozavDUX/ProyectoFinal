@@ -42,4 +42,9 @@
   <file alias="cascaras.png">recursos/sprites/cascaras.png</file>
   <file alias="chile.png">recursos/sprites/chile.png</file>
  </qresource>
+ <qresource prefix="/videos">
+   <file alias="intro_nivel1.mp4">recursos/videos/introduccion_nivel1.mp4</file>
+   <file alias="intro_nivel2.mp4">recursos/videos/introduccion_nivel2.mp4</file>
+   <file alias="final_juego.mp4">recursos/videos/final_juego.mp4</file>
+  </qresource>
 </RCC>
