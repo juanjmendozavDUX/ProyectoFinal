@@ -1,28 +1,25 @@
-#ifndef AVION_H
-#define AVION_H
+#pragma once
+#include <QPointF>
+#include <QRectF>
 
-#include <QMainWindow>
-#include <QQuickItem>
-#include <QSharedDataPointer>
-#include <QWidget>
-
-class avionData;
-
-class avion : public QWidget
+class Avion
 {
-    Q_OBJECT
 public:
-    explicit avion(QWidget *parent = nullptr);
-    avion(const avion &);
-    avion(avion &&);
-    avion &operator=(const avion &);
-    avion &operator=(avion &&);
-    ~avion();
-
-signals:
-
+    Avion();
+    void activar(const QPointF& posicion, double velocidad);
+    void desactivar();
+    void actualizar(double deltaTime);
+    bool activo() const { return m_activo; }
+    bool debeLanzarSoldado();
+    bool debeLanzarBomba(const QPointF& objetivo);
+    QPointF posicion() const { return m_posicion; }
+    bool vaHaciaLaDerecha() const { return m_velocidad > 0.0; }
+    QRectF rectangulo() const { return QRectF(m_posicion.x(), m_posicion.y(), 100.0, 45.0); }
 private:
-    QSharedDataPointer<avionData> data;
+    QPointF m_posicion;
+    double m_velocidad;
+    double m_tiempoLanzamiento;
+    double m_tiempoBomba;
+    bool m_lanzo;
+    bool m_activo;
 };
-
-#endif // AVION_H

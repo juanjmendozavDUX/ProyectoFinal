@@ -1,33 +1,43 @@
-QT += widgets multimedia multimediawidgets
+QT += core gui widgets multimedia multimediawidgets
+
 CONFIG += c++17
-TEMPLATE = app
-TARGET = ProyectoFinalDK
 
 SOURCES += \
+    avion.cpp \
+    barco.cpp \
+    bomba.cpp \
+    donky.cpp \
+    donygrafico.cpp \
+    entidades.cpp \
+    gamewidget.cpp \
+    liana.cpp \
     main.cpp \
     mainwindow.cpp \
-    gamewidget.cpp \
-    entidades.cpp \
+    nivel.cpp \
     nivel2widget.cpp \
     objetos.cpp \
     personaje.cpp \
-    donky.cpp \
-    nivel.cpp \
-    donygrafico.cpp \
-    barco.cpp
+    pirana.cpp \
+    soldado_enemigo.cpp
 
 HEADERS += \
-    mainwindow.h \
-    gamewidget.h \
+    avion.h \
+    barco.h \
+    bomba.h \
+    donky.h \
+    donygrafico.h \
     entidades.h \
+    gamewidget.h \
+    liana.h \
+    mainwindow.h \
+    nivel.h \
     nivel2widget.h \
     objetos.h \
     personaje.h \
-    donky.h \
-    nivel.h \
-    donygrafico.h \
-    barco.h
+    pirana.h \
+    soldado_enemigo.h
 
-RESOURCES += recursos.qrc
+RESOURCES += \
+    recursos.qrc
 
 win32:CONFIG += windows

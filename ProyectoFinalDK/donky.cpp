@@ -15,7 +15,8 @@ Donky::Donky(const QPointF& posicionInicial)
     m_vidaMaxima(100),
     m_tiempoInvulnerable(0.0),
     m_cuadroAnimacion(0),
-    m_tiempoAnimacion(0.0)
+    m_tiempoAnimacion(0.0),
+    m_suelo(420.0)
 {
 }
 
@@ -23,8 +24,6 @@ void Donky::actualizar(double deltaTime)
 {
     const double velocidadMovimiento = 210.0;
     const double gravedad = 950.0;
-    const double suelo = 420.0;
-
     m_velocidadX = 0.0;
 
     if (m_moverIzquierda && !m_moverDerecha) {
@@ -41,8 +40,8 @@ void Donky::actualizar(double deltaTime)
         m_velocidadY += gravedad * deltaTime;
         m_posicion.ry() += m_velocidadY * deltaTime;
 
-        if (m_posicion.y() >= suelo) {
-            m_posicion.setY(suelo);
+        if (m_posicion.y() >= m_suelo) {
+            m_posicion.setY(m_suelo);
             m_velocidadY = 0.0;
             m_saltando = false;
         }
@@ -76,7 +75,7 @@ void Donky::actualizar(double deltaTime)
         m_tiempoAnimacion += deltaTime;
         if (m_tiempoAnimacion >= 0.11) {
             ++m_cuadroAnimacion;
-            if (m_cuadroAnimacion >= 8)
+            if (m_cuadroAnimacion >= 7)
                 m_cuadroAnimacion = 0;
             m_tiempoAnimacion = 0.0;
         }
@@ -141,6 +140,11 @@ void Donky::recibirDanio(int cantidad)
     m_tiempoInvulnerable = 1.0;
 }
 
+void Donky::morir()
+{
+    m_vida = 0;
+}
+
 void Donky::curar(int cantidad)
 {
     if (cantidad <= 0 || m_vida <= 0)
@@ -165,6 +169,7 @@ void Donky::reiniciarEstado(const QPointF& posicionInicial)
     m_tiempoInvulnerable = 0.0;
     m_cuadroAnimacion = 0;
     m_tiempoAnimacion = 0.0;
+    m_suelo = 420.0;
 }
 
 QPointF Donky::posicion() const { return m_posicion; }
@@ -176,6 +181,12 @@ bool Donky::esInvulnerable() const { return m_tiempoInvulnerable > 0.0; }
 int Donky::vida() const { return m_vida; }
 int Donky::vidaMaxima() const { return m_vidaMaxima; }
 bool Donky::estaVivo() const { return m_vida > 0; }
+double Donky::velocidadVertical() const { return m_velocidadY; }
+void Donky::establecerSuelo(double y) { m_suelo = y; }
+void Donky::colocarSobreSuperficie(double y)
+{
+    if (!m_saltando) m_posicion.setY(y);
+}
 
 QRectF Donky::rectanguloColision() const
 {
@@ -188,4 +199,12 @@ QRectF Donky::rectanguloAtaque() const
         return QRectF();
     const double alcanceX = m_mirandoDerecha ? (m_posicion.x() + 64.0) : (m_posicion.x() - 36.0);
     return QRectF(alcanceX, m_posicion.y() + 12.0, 46.0, 54.0);
+}
+
+void Donky::iniciarCaida()
+{
+    if (!m_saltando) {
+        m_saltando = true;
+        m_velocidadY = 0.0;
+    }
 }

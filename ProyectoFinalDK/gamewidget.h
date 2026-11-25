@@ -1,10 +1,13 @@
 #pragma once
 
 #include <QGraphicsView>
+#include <QPixmap>
 #include <memory>
 #include "nivel.h"
 
 class QGraphicsRectItem;
+class QGraphicsPixmapItem;
+class QGraphicsLineItem;
 class QGraphicsScene;
 class QGraphicsTextItem;
 class QTimer;
@@ -33,6 +36,8 @@ private slots:
 
 private:
     void actualizarHUD();
+    void crearEntidadesGraficas();
+    void actualizarEntidadesGraficas();
 
     QGraphicsScene* m_escena;
     QGraphicsTextItem* m_textoHUD;
@@ -45,4 +50,14 @@ private:
     bool m_activo = false;
     bool m_esDificil = false;
     int m_puntaje = 0;
+    QGraphicsPixmapItem* m_barcosGraficos[MAX_BARCOS]{};
+    QGraphicsPixmapItem* m_avionesGraficos[MAX_AVIONES]{};
+    QGraphicsPixmapItem* m_soldadosGraficos[MAX_SOLDADOS]{};
+    QGraphicsPixmapItem* m_bombasGraficas[MAX_BOMBAS]{};
+    QGraphicsPixmapItem* m_piranasGraficas[MAX_PIRANAS]{};
+    QGraphicsLineItem* m_lianasGraficas[MAX_LIANAS]{};
+    QPixmap m_soldadoSheet;
+    QPixmap m_avion1Sheet;
+    QPixmap m_avion2Sheet;
+    QPixmap m_bombaSheet;
 };

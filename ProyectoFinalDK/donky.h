@@ -17,9 +17,11 @@ public:
     void detenerDerecha();
     void detenerMovimiento();
     void saltar();
+    void iniciarCaida();
     void atacar();
 
     void recibirDanio(int cantidad);
+    void morir();
     void curar(int cantidad);
     void reiniciarEstado(const QPointF& posicionInicial);
 
@@ -33,6 +35,9 @@ public:
     int vida() const;
     int vidaMaxima() const;
     bool estaVivo() const;
+    double velocidadVertical() const;
+    void establecerSuelo(double y);
+    void colocarSobreSuperficie(double y);
 
     QRectF rectanguloColision() const;
     QRectF rectanguloAtaque() const;
@@ -57,4 +62,5 @@ private:
 
     int m_cuadroAnimacion;
     double m_tiempoAnimacion;
+    double m_suelo;
 };
